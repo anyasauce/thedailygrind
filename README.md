@@ -5,7 +5,7 @@ JosiahAdmin is a modern and responsive admin dashboard template built with **HTM
 ## 🌟 Features
 
 - **Responsive Design**: Fully optimized for desktops, tablets, and mobile devices.
-- **Bootstrap Integration**: Leveraging Bootstrap 4 for a consistent and responsive layout.
+- **Bootstrap Integration**: Leveraging Bootstrap 5 for a consistent and responsive layout.
 - **Dynamic UI**: Interactive elements powered by JavaScript.
 - **Custom Styling**: Enhanced user interface with CSS for a polished look.
 - **Modular Components**: Reusable UI components for faster development.
@@ -34,7 +34,7 @@ JosiahAdmin/
 1. **Clone the Repository**
 
 ```bash
-git clone https://github.com/yourusername/JosiahAdmin.git
+git clone https://github.com/anyasauce/josiahadmin.git
 cd JosiahAdmin
 ```
 
@@ -60,4 +60,9 @@ Contributions are welcome! If you want to improve or add features, feel free to 
 
 ## 📧 Contact
 
-For questions or support, reach out via [your email] or visit the [project repository](https://github.com/yourusername/JosiahAdmin).
+For questions or support, reach out via [your email] or visit the [project repository](https://github.com/anyasauce/JosiahAdmin).
+
+---
+
+🧑‍💻 **Check out my portfolio:** [codewithjosh.vercel.app](https://codewithjosh.vercel.app/)
+
