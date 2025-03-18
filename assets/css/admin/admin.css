@@ -18,7 +18,6 @@ html {
 
 ::-webkit-scrollbar-track {
     background: #f0f0f0;
-    /* Light background */
 }
 
 ::-webkit-scrollbar-thumb {
@@ -30,7 +29,7 @@ html {
     background: #6a6ff2;
 }
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Poppins', sans-serif;
     background-color: #f5f7fb;
     display: flex;
     min-height: 100vh;
@@ -512,7 +511,6 @@ body.dark-mode #sidebarCollapseBtn {
 /* Search Bar Dark Mode */
 body.dark-mode .search-bar .input-group-text {
     background-color: #222831 !important;
-    
     color: white !important;
     border-color: #555 !important;
 }
@@ -526,3 +524,4 @@ body.dark-mode .search-bar .form-control {
 body.dark-mode .search-bar .form-control::placeholder {
     color: #bbb !important;
 }
+

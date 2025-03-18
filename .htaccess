@@ -1,0 +1,10 @@
+<Files 'conn.php'>
+    Order Allow,Deny
+    Deny from all
+</Files>
+ErrorDocument 404 /thedailygrind/config/404.php
+
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.+)$ $1.php [L]
