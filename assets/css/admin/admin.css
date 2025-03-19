@@ -326,6 +326,14 @@ body {
     border-color: var(--primary);
 }
 
+.text-primary {
+    color: var(--primary);
+}
+
+.bg-primary {
+    color: var(--primary);
+}
+
 .btn-primary:hover {
     background: var(--primary-dark);
     border-color: var(--primary-dark);

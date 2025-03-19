@@ -8,28 +8,21 @@ $tax = 0;
 $delivery_fee = 50.00;
 $total = 0;
 
-$query = "SELECT cart.user_id, cart.product_id, cart.quantity, products.product_name, products.price, products.image 
-          FROM cart 
-          JOIN products ON cart.product_id = products.product_id 
-          WHERE cart.user_id = ?";
-$stmt = mysqli_prepare($conn, $query);
-mysqli_stmt_bind_param($stmt, "i", $user_id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$user_id = (int) $user_id;
 
-while ($row = mysqli_fetch_assoc($result)) {
-    $cart_items[] = [
-        'product_id' => $row['product_id'],
-        'product_name' => $row['product_name'],
-        'price' => $row['price'],
-        'quantity' => $row['quantity'],
-        'image' => $row['image']
-    ];
-    $subtotal += $row['price'] * $row['quantity'];
-}
+include_once BASE_PATH . 'controllers/user/fetchCart.php';
 
 $tax = $subtotal * 0.12;
 $total = $subtotal + $tax + $delivery_fee;
+
+if (empty($cart_items)) {
+    ?>
+    <script>
+        location.href = "<?= route('user', 'cart'); ?>";
+    </script>
+    <?php
+exit();
+}
 ?>
 
 <!DOCTYPE html>
@@ -51,11 +44,9 @@ include BASE_PATH . 'components/user/head.php';
             </div>
         </div>
 
-        <form id="checkoutForm" action="../controllers/user/process_order.php" method="POST">
+        <form id="checkoutForm" action="<?= route('controllers', 'process_order') ?>" method="POST">
             <div class="row g-4">
-                <!-- Left Column - Customer Details -->
                 <div class="col-lg-8">
-                    <!-- Progress Indicator -->
                     <div class="card border-0 shadow-sm mb-4">
                         <div class="card-body p-3">
                             <div class="progress" style="height: 4px;">
@@ -231,6 +222,7 @@ include BASE_PATH . 'components/user/head.php';
                                                 <small class="text-muted">Quantity: <?= $item['quantity'] ?></small>
                                                 <p class="mb-0 fw-bold">
                                                     ₱<?= number_format($item['price'] * $item['quantity'], 2) ?></p>
+                                                <p class="mt-2"><strong>Size:</strong> <?= htmlspecialchars($item['size']) ?></p>
                                             </div>
                                         </div>
                                     </li>
@@ -322,18 +314,24 @@ include BASE_PATH . 'components/user/head.php';
 
             function toggleSections() {
                 let newTotal = baseTotal;
+                const deliveryFeeInput = document.querySelector('input[name="delivery_fee"]');
+                const totalInput = document.querySelector('input[name="total"]');
 
                 if (pickupOption.checked) {
                     paymentMethodSection.style.display = "none";
                     deliveryFeeSection.style.display = "none";
                     deliveryFeeAmount.textContent = "₱0.00";
+                    deliveryFeeInput.value = 0;
+                    newTotal = baseTotal - deliveryFee;
                 } else {
                     paymentMethodSection.style.display = "block";
                     deliveryFeeSection.style.display = "flex";
                     deliveryFeeAmount.textContent = `₱${deliveryFee.toFixed(2)}`;
-                    newTotal += deliveryFee;
+                    deliveryFeeInput.value = deliveryFee;
+                    newTotal = baseTotal;
                 }
 
+                totalInput.value = newTotal;
                 totalAmount.textContent = `₱${newTotal.toFixed(2)}`;
             }
 

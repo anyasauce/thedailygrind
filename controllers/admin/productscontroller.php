@@ -59,7 +59,7 @@ if (isset($_POST['add_products'])) {
     }
 }
 
-if(isset($_POST['update_products'])){
+if (isset($_POST['update_products'])) {
     $product_id = $_POST['product_id'];
     $product_name = mysqli_real_escape_string($conn, $_POST['product_name']);
     $price = mysqli_real_escape_string($conn, $_POST['price']);
@@ -72,8 +72,14 @@ if(isset($_POST['update_products'])){
     $image = $row['image'];
 
     if (!empty($_FILES['image']['name'])) {
-        $category = isset($_POST['category']) ? $_POST['category'] : 'Uncategorized';
+        if (!empty($image)) {
+            $image_path = $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/' . $image;
+            if (file_exists($image_path)) {
+                unlink($image_path);
+            }
+        }
 
+        $category = isset($_POST['category']) ? $_POST['category'] : 'Uncategorized';
         $upload_root = $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/assets/images/uploads/';
         $category_folder = $upload_root . $category;
 
@@ -81,7 +87,7 @@ if(isset($_POST['update_products'])){
             mkdir($category_folder, 0777, true);
         }
 
-        $image_name = time() . '_' . basename($_FILES['image']['name']);
+        $image_name = strtolower(str_replace(' ', '_', $product_name)) . '_' . time() . '.' . pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION);
         $image_tmp = $_FILES['image']['tmp_name'];
         $image_path = $category_folder . '/' . $image_name;
 
@@ -150,6 +156,32 @@ if(isset($_POST['delete_products'])){
         </script>
         <?php
     }
+}
+
+if(isset($_POST['add_category'])){
+    $category_name = mysqli_real_escape_string($conn, $_POST['category_name']);
+
+    $addCategory = mysqli_query($conn, "INSERT INTO category (category_name) VALUES ('$category_name')");
+
+    if($addCategory){
+        $_SESSION['message'] = "Added Category!";
+        $_SESSION['type'] = "success";
+        ?>
+        <script>
+            location.href = "<?= route('admin', 'products'); ?>";
+        </script>
+        <?php
+        exit();
+    } else {
+        $_SESSION['message'] = "Error adding category.";
+        $_SESSION['type'] = "error";
+        ?>
+        <script>
+            location.href = "<?= route('admin', 'products'); ?>";
+        </script>
+        <?php
+    }
+
 }
 
 ?>

@@ -1,5 +1,5 @@
 <?php
-include __DIR__ . '/config/config.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/config/config.php';
 ?>
 
 <!DOCTYPE html>
@@ -7,11 +7,11 @@ include __DIR__ . '/config/config.php';
 
 <?php
 $pageTitle = "The Daily Grind | Home";
-include __DIR__ . '/components/user/head.php';
+include BASE_PATH . 'components/user/head.php';
 ?>
 
 <body class="bg-light">
-    <?php include __DIR__ . '/components/user/header.php'; ?>
+    <?php include BASE_PATH . 'components/user/header.php'; ?>
 
     <main>
 

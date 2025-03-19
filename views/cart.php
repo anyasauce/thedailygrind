@@ -5,23 +5,7 @@ include BASE_PATH . 'components/user/user_session.php';
 $cart_items = [];
 $subtotal = 0;
 
-$fetch = mysqli_query($conn, "SELECT cart.user_id, cart.product_id, cart.quantity, products.product_name AS product_name, products.price, products.image, products.status
-          FROM cart
-          JOIN products ON cart.product_id = products.product_id
-          WHERE cart.user_id = '$user_id'");
-
-while ($row = mysqli_fetch_assoc($fetch)) {
-    $cart_items[] = [
-        'product_id' => $row['product_id'],
-        'user_id' => $row['user_id'],
-        'image' => $row['image'],
-        'product_name' => $row['product_name'],
-        'price' => $row['price'],
-        'quantity' => $row['quantity'],
-        'status' => $row['status']
-    ];
-    $subtotal += $row['price'] * $row['quantity'];
-}
+include_once BASE_PATH . 'controllers/user/fetchCart.php';
 
 ?>
 
@@ -58,28 +42,32 @@ include BASE_PATH . 'components/user/head.php';
             </div>
         <?php else: ?>
             <div class="row g-4">
-                <div class="col-lg-8">
-                    <div class="card border-0 shadow-sm mb-4">
-                        <div class="card-body p-3">
-                            <div class="progress" style="height: 4px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: 5%" aria-valuenow="66"
-                                    aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                            <div class="d-flex justify-content-between mt-2">
-                                <div class="text-success"><i class="bi bi-check-circle-fill"></i> Cart</div>
-                                <div class="text-muted">Checkout</div>
-                                <div class="text-muted">Confirmation</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card border-0 shadow-sm">
-                        <div class="card-header bg-white py-3">
-                            <div class="row align-items-center">
-                                <div class="col">
-                                    <h5 class="mb-0">Cart Items (<?= count($cart_items) ?>)</h5>
+    <div class="col-lg-8">
+        <!-- Progress bar card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-3">
+                <div class="progress" style="height: 4px;">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: 5%" aria-valuenow="66"
+                        aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <div class="d-flex justify-content-between mt-2">
+                    <div class="text-success"><i class="bi bi-check-circle-fill"></i> <span class="d-none d-sm-inline">Cart</span></div>
+                    <div class="text-muted"><span class="d-none d-sm-inline">Checkout</span></div>
+                    <div class="text-muted"><span class="d-none d-sm-inline">Confirmation</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Cart items card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h5 class="mb-0">Cart Items (<?= count($cart_items) ?>)</h5>
                                 </div>
                                 <div class="col text-end">
-                                    <a href="<?= route('user', 'menu'); ?>" class="btn btn-sm btn-outline-primary">Add More Items</a>
+                                    <a href="<?= route('user', 'menu'); ?>" class="btn btn-sm btn-outline-primary">Add More
+                                        Items</a>
                                 </div>
                             </div>
                         </div>
@@ -87,35 +75,52 @@ include BASE_PATH . 'components/user/head.php';
                             <ul class="list-group list-group-flush">
                                 <?php foreach ($cart_items as $item): ?>
                                     <li class="list-group-item py-3">
-                                        <div class="row align-items-center">
-                                            <div class="col-md-2 mb-2 mb-md-0">
+                                        <div class="row g-3">
+                                            <!-- Product Image -->
+                                            <div class="col-4 col-md-2">
                                                 <img src="/thedailygrind/<?= htmlspecialchars($item['image']) ?>"
-                                                    alt="<?= htmlspecialchars($item['product_name']) ?>" class="img-fluid rounded" width="100">
+                                                    alt="<?= htmlspecialchars($item['product_name']) ?>" class="img-fluid rounded"
+                                                    width="100">
                                             </div>
-                                            <div class="col-md-4 mb-2 mb-md-0">
-                                                <h5 class="mb-1"><?= htmlspecialchars($item['product_name']) ?></h5>
+            
+                                            <!-- Product Details -->
+                                            <div class="col-8 col-md-4">
+                                                <h5 class="mb-1 fs-6 fs-md-5"><?= htmlspecialchars($item['product_name']) ?></h5>
                                                 <span class="badge bg-success"><?= htmlspecialchars($item['status']) ?></span>
+                                                <p class="mt-2 mb-0"><strong>Size:</strong> <?= htmlspecialchars($item['size']) ?></p>
                                             </div>
-                                            <div class="col-md-3 text-md-center mb-2 mb-md-0">
-                                                <form action="<?= route('controllers', 'cart_process'); ?>" method="POST">
-                                                    <input type="hidden" name="product_id" value="<?= htmlspecialchars($item['product_id']) ?>">
-                                                    <div class="input-group input-group-sm" style="max-width: 120px;">
-                                                        <button type="submit" name="decrease" class="btn btn-outline-secondary">-</button>
+            
+                                            <div class="col-7 col-md-3 d-flex align-items-center">
+                                                <form action="<?= route('controllers', 'cart_process'); ?>" method="POST" class="w-100">
+                                                    <input type="hidden" name="id"
+                                                        value="<?= htmlspecialchars($item['id']) ?>">
+                                                    <div class="input-group input-group-sm mx-auto" style="max-width: 120px;">
+                                                        <button type="submit" name="decrease"
+                                                            class="btn btn-outline-secondary">-</button>
                                                         <input type="text" class="form-control text-center" name="quantity"
-                                                            value="<?= isset($item['quantity']) ? htmlspecialchars($item['quantity']) : '1'; ?>" readonly>
-                                                        <button type="submit" name="increase" class="btn btn-outline-secondary">+</button>
+                                                            value="<?= isset($item['quantity']) ? htmlspecialchars($item['quantity']) : '1'; ?>"
+                                                            readonly>
+                                                        <button type="submit" name="increase"
+                                                            class="btn btn-outline-secondary">+</button>
                                                     </div>
                                                 </form>
                                             </div>
-                                            <div class="col-md-2 text-md-end mb-2 mb-md-0">
-                                                <span class="fw-bold">₱<?= number_format($item['price'] * $item['quantity'], 2) ?></span>
+            
+                                            <!-- Price -->
+                                            <div class="col-3 col-md-2 text-end">
+                                                <span
+                                                    class="fw-bold">₱<?= number_format($item['price'] * $item['quantity'], 2) ?></span>
                                                 <br>
-                                                <small class="text-muted">₱<?= number_format($item['price'], 2) ?> each</small>
+                                                <small class="text-muted d-none d-md-inline">₱<?= number_format($item['price'], 2) ?>each</small>
                                             </div>
-                                            <div class="col-md-1 text-md-end">
+            
+                                            <!-- Delete Button -->
+                                            <div class="col-2 col-md-1 text-end">
                                                 <form action="<?= route('controllers', 'cart_process'); ?>" method="POST">
-                                                    <input type="hidden" name="product_id" value="<?= htmlspecialchars($item['product_id']) ?>">
-                                                    <button type="submit" name="delete" class="btn btn-sm btn-outline-danger" title="Remove item">
+                                                    <input type="hidden" name="id"
+                                                        value="<?= htmlspecialchars($item['id']) ?>">
+                                                    <button type="submit" name="delete" class="btn btn-sm btn-outline-danger"
+                                                        title="Remove item">
                                                         <i class="bi bi-trash"></i>
                                                     </button>
                                                 </form>
@@ -124,14 +129,13 @@ include BASE_PATH . 'components/user/head.php';
                                     </li>
                                 <?php endforeach; ?>
                             </ul>
-                            
-
                         </div>
                     </div>
                 </div>
-
+            
+                <!-- Order Summary Card -->
                 <div class="col-lg-4">
-                    <div class="card border-0 shadow-sm">
+                    <div class="card border-0 shadow-sm sticky-lg-top" style="top: 1rem;">
                         <div class="card-header bg-white py-3">
                             <h5 class="mb-0">Order Summary</h5>
                         </div>
@@ -153,11 +157,11 @@ include BASE_PATH . 'components/user/head.php';
                                 <span class="fw-bold">Estimated Total</span>
                                 <span class="fw-bold">₱<?= number_format($subtotal, 2) ?></span>
                             </div>
-
+            
                             <div class="mb-3">
                                 <input type="text" class="form-control" placeholder="Enter coupon code">
                             </div>
-
+            
                             <div class="d-grid gap-2">
                                 <a href="checkout.php" class="btn btn-primary py-2">Proceed to Checkout</a>
                             </div>

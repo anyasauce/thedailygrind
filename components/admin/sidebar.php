@@ -34,25 +34,25 @@ $current_page = basename($_SERVER['PHP_SELF']);
     <div class="menu-category">Management</div>
     <ul class="nav flex-column">
         <li class="nav-item">
-            <a class="nav-link <?php echo ($current_page == 'users.php') ? 'active' : ''; ?>" href="<?= route('admin', key: 'users') ?>"
+            <a class="nav-link <?php echo ($current_page == 'users.php') ? 'active' : ''; ?>" href="<?= route('admin', key: 'users') ?>">
                 <i class="fas fa-users"></i>
                 <span class="nav-text">Users</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php echo ($current_page == 'products.php') ? 'active' : ''; ?>" href="<?= route('admin', key: 'products') ?>"
+            <a class="nav-link <?php echo ($current_page == 'products.php') ? 'active' : ''; ?>" href="<?= route('admin', key: 'products') ?>">
                 <i class="fas fa-file-alt"></i>
                 <span class="nav-text">Products</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php echo ($current_page == 'orders.php') ? 'active' : ''; ?>" href="<?= route('admin', 'orders') ?>"
+            <a class="nav-link <?php echo ($current_page == 'orders.php') ? 'active' : ''; ?>" href="<?= route('admin', 'orders') ?>">
                 <i class="fas fa-shopping-cart"></i>
                 <span class="nav-text">Orders</span>
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link <?php echo ($current_page == 'sold.php') ? 'active' : ''; ?>" href="<?= route('admin', 'sold') ?>"
+            <a class="nav-link <?php echo ($current_page == 'sold.php') ? 'active' : ''; ?>" href="<?= route('admin', 'sold') ?>">
                 <i class="fas fa-check-circle"></i>
                 <span class="nav-text">Sold</span>
             </a>

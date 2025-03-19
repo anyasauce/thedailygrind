@@ -3,8 +3,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/config/config.php';
 include BASE_PATH . 'components/user/user_session.php';
 
 $user_id = $_SESSION['user']['user_id'];
-$query = "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY created_at DESC";
-$result = mysqli_query($conn, $query);
+$result = mysqli_query($conn, "SELECT * FROM orders WHERE user_id = '$user_id' ORDER BY created_at DESC");
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +21,7 @@ include BASE_PATH . 'components/user/head.php';
             <h2 class="mb-4 text-center text-primary">My Orders</h2>
 
             <div class="table-responsive">
-                <table class="table table-hover table-bordered text-center align-middle">
+                <table id="ordersTable" class="table table-hover table-bordered text-center align-middle">
                     <thead class="table-dark">
                         <tr>
                             <th>Order ID</th>
@@ -34,11 +33,6 @@ include BASE_PATH . 'components/user/head.php';
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (mysqli_num_rows($result) == 0): ?>
-                            <tr>
-                                <td colspan="6" class="fs-5">No orders found.</td>
-                            </tr>
-                        <?php endif; ?>
                         <?php while ($row = mysqli_fetch_assoc($result)): ?>
                             <tr>
                                 <td>#<?php echo $row['order_id']; ?></td>
@@ -69,12 +63,20 @@ include BASE_PATH . 'components/user/head.php';
                             </tr>
                         <?php endwhile; ?>
                     </tbody>
+
                 </table>
             </div>
         </div>
     </main>
 
     <?php include BASE_PATH . 'components/user/footer.php'; ?>
+
+    <script>
+        $(document).ready(function() {
+            $('#ordersTable').DataTable();
+        });
+    </script>
+
 
 </body>
 

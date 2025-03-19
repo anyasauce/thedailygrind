@@ -11,11 +11,11 @@ if (!isset($_SESSION['user']['email'])) {
     die("User not logged in.");
 }
 
-if (isset($_POST['product_id'])) {
-    $product_id = intval($_POST['product_id']);
+if (isset($_POST['id'])) {
+    $id = intval($_POST['id']);
 
     if (isset($_POST['increase'])) {
-        $increase = mysqli_query($conn, "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $user_id AND product_id = $product_id");
+        $increase = mysqli_query($conn, "UPDATE cart SET quantity = quantity + 1 WHERE user_id = $user_id AND id = $id");
         if ($increase) {
             ?>
             <script>
@@ -28,7 +28,7 @@ if (isset($_POST['product_id'])) {
     }
 
     if (isset($_POST['decrease'])) {
-        $decrease = mysqli_query($conn, "UPDATE cart SET quantity = GREATEST(quantity - 1, 1) WHERE user_id = $user_id AND product_id = $product_id");
+        $decrease = mysqli_query($conn, "UPDATE cart SET quantity = GREATEST(quantity - 1, 1) WHERE user_id = $user_id AND id = $id");
         if ($decrease) {
             ?>
             <script>
@@ -41,7 +41,7 @@ if (isset($_POST['product_id'])) {
     }
 
     if (isset($_POST['delete'])) {
-        $delete = mysqli_query($conn, "DELETE FROM cart WHERE user_id = $user_id AND product_id = $product_id");
+        $delete = mysqli_query($conn, "DELETE FROM cart WHERE user_id = $user_id AND id = $id");
         if ($delete) {
             ?>
             <script>

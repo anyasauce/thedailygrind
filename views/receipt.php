@@ -18,9 +18,9 @@ if (!$order) {
 }
 
 $query = "SELECT oi.*, p.product_name
-          FROM order_items oi
-          JOIN products p ON oi.product_id = p.product_id
-          WHERE oi.order_id = $order_id";
+    FROM order_items oi
+    JOIN products p ON oi.product_id = p.product_id
+    WHERE oi.order_id = $order_id";
 
 $result = mysqli_query($conn, $query);
 
@@ -37,6 +37,7 @@ $subtotal = $order['total'] - $order['tax'] - $order['delivery_fee'];
 $tax = $order['tax'];
 $delivery_fee = $order['delivery_fee'];
 $totalAmount = $order['total'];
+
 ?>
 
 

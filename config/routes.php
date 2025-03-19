@@ -2,35 +2,35 @@
 
 $routes = [
     'user' => [
-        'home' => '/thedailygrind/index#home',
-        'menu' => '/thedailygrind/views/menu',
-        'contact' => '/thedailygrind/views/contact',
-        'cart' => '/thedailygrind/views/cart',
-        'profile' => '/thedailygrind/views/profile',
-        'orders' => '/thedailygrind/views/orders',
-        'login' => '/thedailygrind/views/auth/login',
-        'register' => '/thedailygrind/views/auth/register',
-        'receipt' => '/thedailygrind/views/receipt',
-        'logout' => '/thedailygrind/controllers/logout',
-        'update_profile' => '/thedailygrind/controllers/user/update_profile',
+        'home' => BASE_URL . 'index#home',
+        'menu' => BASE_URL . 'views/menu',
+        'contact' => BASE_URL . 'views/contact',
+        'cart' => BASE_URL . 'views/cart',
+        'profile' => BASE_URL . 'views/profile',
+        'orders' => BASE_URL . 'views/orders',
+        'login' => BASE_URL . 'views/auth/login',
+        'register' => BASE_URL . 'views/auth/register',
+        'receipt' => BASE_URL . 'views/receipt',
+        'logout' => BASE_URL . 'controllers/logout',
+        'update_profile' => BASE_URL . 'controllers/user/update_profile',
     ],
 
     'admin' => [
-        'dashboard' => '/thedailygrind/admin/admin',
-        'products' => '/thedailygrind/admin/products',
-        'orders' => '/thedailygrind/admin/orders',
-        'users' => '/thedailygrind/admin/users',
-        'update_admin' => '/thedailygrind/controllers/admin/update_admin',
-        'sold' => '/thedailygrind/admin/sold',
-        'analytics' => '/thedailygrind/admin/analytics',
+        'dashboard' => BASE_URL . 'admin/admin',
+        'products' => BASE_URL . 'admin/products',
+        'orders' => BASE_URL . 'admin/orders',
+        'users' => BASE_URL . 'admin/users',
+        'update_admin' => BASE_URL . 'controllers/admin/update_admin',
+        'sold' => BASE_URL . 'admin/sold',
+        'analytics' => BASE_URL . 'admin/analytics',
     ],
 
     'controllers' => [
-        'addtocart' => '/thedailygrind/controllers/user/addtocart',
-        'cart_process' => '/thedailygrind/controllers/user/cart_process',
-        'process_order' => '/thedailygrind/controllers/user/process_order',
-        'auth_controller' => '/thedailygrind/controllers/auth_controller',
-        'product_controller' => '/thedailygrind/controllers/admin/productscontroller',
+        'addtocart' => BASE_URL . 'controllers/user/addtocart',
+        'cart_process' => BASE_URL . 'controllers/user/cart_process',
+        'process_order' => BASE_URL . 'controllers/user/process_order',
+        'auth_controller' => BASE_URL . 'controllers/auth_controller',
+        'product_controller' => BASE_URL . 'controllers/admin/productscontroller',
     ]
 ];
 
