@@ -4,6 +4,7 @@ include BASE_PATH . 'components/user/user_session.php';
 
 $cart_items = [];
 $subtotal = 0;
+$addon_total = 0; // Initialize addon total
 $tax = 0;
 $delivery_fee = 50.00;
 $total = 0;
@@ -12,18 +13,30 @@ $user_id = (int) $user_id;
 
 include_once BASE_PATH . 'controllers/user/fetchCart.php';
 
-$tax = $subtotal * 0.12;
-$total = $subtotal + $tax + $delivery_fee;
+// Calculate subtotal and addon total
+foreach ($cart_items as $item) {
+    $subtotal += $item['price'] * $item['quantity'];
+    if (!empty($item['addon_price'])) {
+        $addon_total += $item['addon_price'] * $item['quantity'];
+    }
+}
+
+// Calculate tax (12% of subtotal + addon total)
+$tax = ($subtotal + $addon_total) * 0.12;
+
+// Calculate total amount
+$total = $subtotal + $addon_total + $tax + $delivery_fee;
 
 if (empty($cart_items)) {
     ?>
-    <script>
-        location.href = "<?= route('user', 'cart'); ?>";
-    </script>
-    <?php
-exit();
+        <script>
+            location.href = "<?= route('user', 'cart'); ?>";
+        </script>
+        <?php
+        exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -223,6 +236,10 @@ include BASE_PATH . 'components/user/head.php';
                                                 <p class="mb-0 fw-bold">
                                                     ₱<?= number_format($item['price'] * $item['quantity'], 2) ?></p>
                                                 <p class="mt-2"><strong>Size:</strong> <?= htmlspecialchars($item['size']) ?></p>
+                                                <?php if (!empty($item['addon'])): ?>
+                                                    <p class="mt-1 mb-0"><strong>Addon:</strong> <?= htmlspecialchars($item['addon']) ?>
+                                                        (₱<?= number_format($item['addon_price'], 2) ?>)</p>
+                                                <?php endif; ?>
                                             </div>
                                         </div>
                                     </li>
@@ -233,6 +250,12 @@ include BASE_PATH . 'components/user/head.php';
                                     <span>Subtotal</span>
                                     <span>₱<?= number_format($subtotal, 2) ?></span>
                                 </div>
+                                <?php if ($addon_total > 0): ?>
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span>Addons</span>
+                                        <span>₱<?= number_format($addon_total, 2) ?></span>
+                                    </div>
+                                <?php endif; ?>
                                 <div class="d-flex justify-content-between mb-2">
                                     <span>Tax (12%)</span>
                                     <span>₱<?= number_format($tax, 2) ?></span>
@@ -241,13 +264,13 @@ include BASE_PATH . 'components/user/head.php';
                                     <span>Delivery Fee</span>
                                     <span id="deliveryFeeAmount">₱<?= number_format($delivery_fee, 2) ?></span>
                                 </div>
-
+                
                                 <hr>
                                 <div class="d-flex justify-content-between mb-3">
                                     <span class="fw-bold">Total</span>
                                     <span class="fw-bold fs-5" id="totalAmount">₱<?= number_format($total, 2) ?></span>
                                 </div>
-
+                
                                 <div class="mb-3">
                                     <div class="input-group">
                                         <input type="text" class="form-control" placeholder="Promo code">
@@ -258,8 +281,7 @@ include BASE_PATH . 'components/user/head.php';
                         </div>
                         <div class="card-footer bg-white py-3">
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary py-3 fw-bold" id="placeOrderBtn">Place
-                                    Order</button>
+                                <button type="submit" class="btn btn-primary py-3 fw-bold" id="placeOrderBtn">Place Order</button>
                             </div>
                             <div class="text-center mt-3">
                                 <a href="cart.php" class="text-decoration-none">
@@ -269,6 +291,7 @@ include BASE_PATH . 'components/user/head.php';
                         </div>
                     </div>
                 </div>
+
             </div>
         </form>
     </div>

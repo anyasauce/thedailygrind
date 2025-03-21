@@ -55,4 +55,23 @@ if (isset($_POST['id'])) {
 
     exit();
 }
+
+
+
+if (isset($_POST['update_order_status'])) {
+    $order_id = mysqli_real_escape_string($conn, $_POST['order_id']);
+    $status = "Cancelled";
+
+    $updateOrderStatus = mysqli_query($conn, "UPDATE orders SET status = '$status' WHERE order_id = '$order_id'");
+
+    if ($updateOrderStatus) {
+        $_SESSION['message'] = "Your ordered successfully cancelled!";
+        $_SESSION['type'] = "success";
+        ?>
+        <script>
+            location.href = "<?= route('user', 'orders'); ?>";
+        </script>
+        <?php
+    }
+}
 ?>

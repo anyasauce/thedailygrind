@@ -36,14 +36,24 @@ include '../components/admin/head.php'; ?>
                 <div class="row">
                 <h2 class="mb-3">Category</h2>
                 <?php
-                    $categories = $conn->query("SELECT c.category_id, c.category_name, COUNT(p.product_id) as product_count FROM category c LEFT JOIN products p ON c.category_name = p.category GROUP BY c.category_id");
+                $categories = $conn->query("
+                    SELECT c.category_id, c.category_name, 
+                        COUNT(p.product_id) AS product_count, 
+                        IFNULL(SUM(CASE WHEN ord.status = 'Completed' THEN o.quantity ELSE 0 END), 0) AS sold_count
+                    FROM category c
+                    LEFT JOIN products p ON c.category_name = p.category  
+                    LEFT JOIN order_items o ON o.product_id = p.product_id
+                    LEFT JOIN orders ord ON o.order_id = ord.order_id
+                    GROUP BY c.category_id
+                ");
                     while ($category = $categories->fetch_assoc()):
                         ?>
                         <div class="col-md-4">
                             <div class="card p-3 shadow-sm">
                                 <i class="bi bi-cup text-center fs-1"></i>
                                 <h3 class="text-center fw-bold"> <?= $category['category_name']; ?> </h3>
-                                <p class="text-center mb-3">Products: <span class="fw-bold"> <?= $category['product_count']; ?> </span></p>
+                                <p class="text-center mb-3">Total Products: <span class="fw-bold"> <?= $category['product_count']; ?> </span></p>
+                                <p class="text-center mb-3">Total Sold Products: <span class="fw-bold"> <?= $category['sold_count']; ?> </span></p>
                                 <div class="d-flex justify-content-center">
                                     <div class="d-flex justify-content-center">
                                     <a href="view_products.php?category_id=<?= $category['category_id']; ?>&category_name=<?= urlencode($category['category_name']); ?>" class="btn btn-outline-primary">

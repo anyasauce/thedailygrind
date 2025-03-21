@@ -9,14 +9,17 @@ if (isset($_POST['addtocart'])) {
         $size = $_POST['size'];
         $price = floatval($_POST['size_price']);
 
+        $addons = isset($_POST['addon']) ? implode(", ", $_POST['addon']) : null;
+        $addon_price = isset($_POST['addon_price']) ? floatval($_POST['addon_price']) : 0;
+
         $user_query = mysqli_query($conn, "SELECT user_id FROM users WHERE email = '$email'");
         $user = mysqli_fetch_assoc($user_query);
         $user_id = $user['user_id'];
 
-        $check_query = mysqli_query($conn, "SELECT * FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id' AND size = '$size'");
+        $check_query = mysqli_query($conn, "SELECT * FROM cart WHERE user_id = '$user_id' AND product_id = '$product_id' AND size = '$size' AND addon = '$addons'");
 
         if (mysqli_num_rows($check_query) > 0) {
-            mysqli_query($conn, "UPDATE cart SET quantity = quantity + 1 WHERE user_id = '$user_id' AND product_id = '$product_id' AND size = '$size'");
+            mysqli_query($conn, "UPDATE cart SET quantity = quantity + 1 WHERE user_id = '$user_id' AND product_id = '$product_id' AND size = '$size' AND addon = '$addons'");
             $_SESSION['message'] = "Quantity updated!";
             $_SESSION['type'] = "success";
         } else {
@@ -24,8 +27,8 @@ if (isset($_POST['addtocart'])) {
             $product = mysqli_fetch_assoc($product_query);
             $product_name = $product['product_name'];
 
-            mysqli_query($conn, "INSERT INTO cart (user_id, product_id, product_name, price, quantity, size, status) 
-                VALUES ('$user_id', '$product_id', '$product_name', '$price', 1, '$size', 'Available')");
+            mysqli_query($conn, "INSERT INTO cart (user_id, product_id, product_name, price, quantity, size, addon, addon_price, status) 
+                VALUES ('$user_id', '$product_id', '$product_name', '$price', 1, '$size', '$addons', '$addon_price', 'Available')");
 
             $_SESSION['message'] = "Item added to cart!";
             $_SESSION['type'] = "success";

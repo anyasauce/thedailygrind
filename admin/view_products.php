@@ -38,43 +38,66 @@ include '../components/admin/head.php'; ?>
                 <div class="row">
                     <?php
                     $products = $conn->query("SELECT * FROM products WHERE category = '{$category_name}'");
+                    $getSolds = $conn->query("
+                        SELECT p.product_name, SUM(oi.quantity) AS total_solds 
+                        FROM order_items oi
+                        JOIN products p ON oi.product_id = p.product_id
+                        JOIN orders o ON oi.order_id = o.order_id
+                        WHERE o.status = 'Completed'
+                        GROUP BY p.product_name
+                    ");
+
                     if ($products->num_rows > 0):
                         while ($product = $products->fetch_assoc()):
                             ?>
                             <div class="col-md-4 mb-3">
                                 <div class="card shadow-lg border-0 rounded-3 overflow-hidden h-100">
+
+                                <div class="mb-3 fw-bold text-success fs-6">
+                                    <?php
+                                        $total_solds = 0;
+
+                                        while ($row = $getSolds->fetch_assoc()) {
+                                            $total_solds += $row['total_solds'];
+                                        }
+                                        ?>
+                                    Total Sold: <?= htmlspecialchars($total_solds); ?>
+                                </div>
+
                                 <div class="position-relative">
                                     <img src="/thedailygrind/<?= htmlspecialchars($product['image']); ?>"
                                         class="card-img-top object-fit-cover d-block mx-auto" alt="<?= htmlspecialchars($product['product_name']); ?>"
                                         style="height: 150px; width: 60%;">
-                                    
+
                                     <span class="position-absolute top-0 end-0 badge <?= $product['status'] === 'Available' ? 'bg-success' : 'bg-danger' ?> m-2 px-2 py-1 rounded-pill fw-normal">
                                         <?= htmlspecialchars($product['status']); ?>
                                     </span>
                                 </div>
-                                
+
                                 <div class="card-body d-flex flex-column p-3">
                                     <h5 class="card-title fw-bold mb-2"><?= htmlspecialchars($product['product_name']); ?></h5>
-                                    
                                     <p class="card-text text-muted small mb-3" style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
                                         <?= htmlspecialchars($product['description']); ?>
                                     </p>
-                                    
+
                                     <div class="mb-3 fw-bold text-primary fs-5">
                                         ₱<?= htmlspecialchars($product['price']); ?>
                                     </div>
-                                    
+
+                                   
+
                                     <div class="mt-auto d-flex gap-2">
                                         <button type="button" class="btn btn-primary flex-grow-1" data-bs-toggle="modal"
                                                     data-bs-target="#editproductModal<?= $product['product_id']; ?>">
                                             <i class="bi bi-pencil-square me-1"></i> Edit
                                         </button>
-                                        
+
                                         <button type="button" class="btn btn-outline-danger flex-grow-1" data-bs-toggle="modal"
                                             data-bs-target="#deleteModal<?= $product['product_id']; ?>">
                                             <i class="bi bi-trash me-1"></i> Delete
                                         </button>
                                     </div>
+
                                 </div>
                             </div>
                             </div>

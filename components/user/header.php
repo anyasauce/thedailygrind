@@ -25,13 +25,35 @@
                 </li>
                 <?php if ($isLoggedIn): ?>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= route('user', 'cart'); ?>">Add to Cart</a>
+                        <?php
+                            $userID = $_SESSION['user']['user_id'];
+                            $cartData = mysqli_query($conn, "SELECT COUNT(*) as cart_count FROM cart WHERE user_id = '$userID'");
+                            $row = mysqli_fetch_assoc($cartData);
+                            $cartCount = $row['cart_count'] ?? 0;
+                        ?>
+                        <a class="nav-link" href="<?= route('user', 'cart'); ?>">
+                            Cart
+                            <?php if ($cartCount > 0): ?>
+                                <span><sup class="bg-danger p-1 text-white rounded-circle"><?= $cartCount ?></sup></span>
+                            <?php endif; ?>
+                        </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="<?= route('user', 'profile'); ?>">Profile</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="<?= route('user', 'orders'); ?>">My Orders</a>
+                        <?php
+                            $getData = mysqli_query($conn, "SELECT COUNT(*) as order_count FROM orders WHERE status != 'Completed' AND status != 'Cancelled'");
+                            $row = mysqli_fetch_assoc($getData);
+                            $count = $row['order_count'] ?? 0;
+                            ?>
+                        <a class="nav-link" href="<?= route('user', 'orders'); ?>">
+                            My Orders
+                            <?php if ($count > 0): ?>
+                                <span><sup class="bg-danger p-1 text-white rounded-circle"><?= $count ?></sup></span>
+                            <?php endif; ?>
+                        </a>
                     </li>
                 <?php endif; ?>
                 <?php if (!$isLoggedIn): ?>

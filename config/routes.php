@@ -23,6 +23,8 @@ $routes = [
         'update_admin' => BASE_URL . 'controllers/admin/update_admin',
         'sold' => BASE_URL . 'admin/sold',
         'analytics' => BASE_URL . 'admin/analytics',
+        'update_userprofile' => BASE_URL . 'controllers/admin/updateUserProfile',
+        'updateOrderStatus' => BASE_URL . 'controllers/admin/updateOrderStatus',
     ],
 
     'controllers' => [

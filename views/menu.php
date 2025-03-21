@@ -16,11 +16,17 @@ if ($getProducts->num_rows > 0) {
             'product_id' => $row['product_id'],
             'product_name' => $row['product_name'],
             'description' => $row['description'],
+            'status' => $row['status'],
             'price' => $row['price'],
             'image' => $row['image']
         ];
     }
 }
+
+$query = "SELECT p.product_name FROM orders o JOIN products p ON p.product_id = p.product_id GROUP BY p.product_name ORDER BY COUNT(p.product_id) DESC LIMIT 1";
+$result = mysqli_query($conn, $query);
+$bestSeller = mysqli_fetch_assoc($result)['product_name'];
+
 ?>
 
 <!DOCTYPE html>
@@ -54,13 +60,19 @@ include BASE_PATH . 'components/user/head.php';
 
                 <?php foreach ($menuItems as $sectionId => $items): ?>
                     <section id="<?= $sectionId ?>" class="mb-5">
-                        <h2 class="text-start mb-4 border-bottom pb-2"><?= ucfirst(str_replace('_', ' ', $sectionId)) ?>
+                        <h2 class="text-start mb-4 border-bottom pb-2">
+                            <?= ucfirst(str_replace('_', ' ', $sectionId)) ?>
                         </h2>
                         <div class="row">
-                            <?php foreach ($items as $item): ?>
+                            <?php foreach ($items as $item):
+                                $isOutOfStock = ($item['status'] === 'Out of Stock'); ?>
                                 <div class="col-6 col-md-4 col-lg-3 mb-4">
-                                    <div data-bs-toggle="modal" data-bs-target="#productModal<?= $item['product_id']; ?>"
-                                        class="d-flex justify-content-center align-items-center cursor-pointer" style="height: 170px;">
+                                    <?php if ($item['product_name'] === $bestSeller): ?>
+                                        <sup class="text-danger fw-bold">Best Seller</sup>
+                                    <?php endif; ?>
+                                    <div <?= !$isOutOfStock ? 'data-bs-toggle="modal" data-bs-target="#productModal' . $item['product_id'] . '"' : '' ?>
+                                        class="d-flex justify-content-center align-items-center cursor-pointer <?= $isOutOfStock ? 'disabled' : '' ?>"
+                                        style="height: 170px; <?= $isOutOfStock ? 'opacity: 0.5; cursor: not-allowed;' : '' ?>">
                                         <span class="position-relative">
                                             <img src="/thedailygrind/<?= htmlspecialchars($item['image']) ?>"
                                                 alt="<?= htmlspecialchars($item['product_name']) ?>"
@@ -69,13 +81,19 @@ include BASE_PATH . 'components/user/head.php';
                                         </span>
                                     </div>
                                     <div class="text-center mt-2">
-                                        <h3 class="fs-5"><?= $item['product_name'] ?></h3>
+                                        <h3 class="fs-5">
+                                            <?= $item['product_name'] ?>
+                                        </h3>
+                                        <?php if ($isOutOfStock): ?>
+                                            <span class="text-danger fw-bold">(Out of Stock)</span>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             <?php endforeach; ?>
                         </div>
                     </section>
                 <?php endforeach; ?>
+
             </main>
         </div>
     </div>
@@ -111,8 +129,31 @@ include BASE_PATH . 'components/user/head.php';
                                                 <input type="hidden" name="size_selected" id="sizeSelected<?= $item['product_id']; ?>">
                                                 <input type="hidden" id="totalPrice<?= $item['product_id']; ?>" name="total_price"
                                                     value="<?= $item['price']; ?>">
-    
-                                                <?php if (!in_array($sectionId, ['breakfast', 'lunch', 'extra'])): ?>
+
+                                                <?php if (in_array($sectionId, ['breakfast', 'lunch', 'extra'])): ?>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input size-radio" type="radio" name="size" value="solo" id="solo<?= $item['product_id'] ?>"
+                                                            data-price="0" required>
+                                                        <label class="form-check-label" for="solo<?= $item['product_id'] ?>">
+                                                            <span class="rounded-circle border border-secondary p-1">
+                                                                <img src="../assets/images/size/s.png" alt="" style="width: 90px;" class="img-fluid">
+                                                            </span>
+                                                            Solo<br>
+                                                            <small class="text-muted">Solo</small>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input size-radio" type="radio" name="size" value="duo" id="duo<?= $item['product_id'] ?>"
+                                                            data-price="30" required>
+                                                        <label class="form-check-label" for="duo<?= $item['product_id'] ?>">
+                                                            <span class="rounded-circle border border-secondary p-1">
+                                                                <img src="../assets/images/size/m.png" alt="" style="width: 90px;" class="img-fluid">
+                                                            </span>
+                                                            Duo<br>
+                                                            <small class="text-muted">Duo</small>
+                                                        </label>
+                                                    </div>
+                                                <?php else: ?>
                                                     <div class="form-check form-check-inline">
                                                         <input class="form-check-input size-radio" type="radio" name="size" value="12oz"
                                                             id="size12oz<?= $item['product_id'] ?>" data-price="0" required>
@@ -146,6 +187,33 @@ include BASE_PATH . 'components/user/head.php';
                                                             <small class="text-muted">22 fl oz</small>
                                                         </label>
                                                     </div>
+                                                    <h5 class="mt-3 text-primary">Choose Add-ons:</h5>
+                                                    <div class="d-flex justify-content-start flex-wrap gap-2">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input addon-checkbox d-none" type="checkbox" name="addon[]" value="creamy" id="addon-creamy" data-price="10">
+                                                            <label class="btn btn-outline-primary btn-sm shadow-sm fw-bold px-3 py-1 addon-label" for="addon-creamy">Creamy (+₱10)</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input addon-checkbox d-none" type="checkbox" name="addon[]" value="sugar" id="addon-sugar" data-price="5">
+                                                            <label class="btn btn-outline-primary btn-sm shadow-sm fw-bold px-3 py-1 addon-label" for="addon-sugar">Sugar (+₱5)</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input addon-checkbox d-none" type="checkbox" name="addon[]" value="pearls" id="addon-pearls" data-price="15">
+                                                            <label class="btn btn-outline-primary btn-sm shadow-sm fw-bold px-3 py-1 addon-label" for="addon-pearls">Pearls (+₱15)</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input addon-checkbox d-none" type="checkbox" name="addon[]" value="chocolate" id="addon-chocolate" data-price="20">
+                                                            <label class="btn btn-outline-primary btn-sm shadow-sm fw-bold px-3 py-1 addon-label" for="addon-chocolate">Chocolate (+₱20)</label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input addon-checkbox d-none" type="checkbox" name="addon[]" value="marshmallow" id="addon-marshmallow" data-price="25">
+                                                            <label class="btn btn-outline-primary btn-sm shadow-sm fw-bold px-3 py-1 addon-label" for="addon-marshmallow">Marshmallow (+₱25)</label>
+                                                        </div>
+                                                    </div>
+
+                                                    <input type="hidden" name="addon_price" id="addon_price" value="0">
+                                                    <p class="mt-2 fw-bold">Total Add-on Price: ₱<span id="total-addon-price">0</span></p>
+
                                                 <?php endif; ?>
 
                                                 <div class="text-end mt-4">
@@ -173,6 +241,35 @@ include BASE_PATH . 'components/user/head.php';
                             document.getElementById("sizeSelected<?= $item['product_id']; ?>").value = this.value;
                             document.getElementById("totalPrice<?= $item['product_id']; ?>").value = finalPrice;
                         });
+
+                        document.querySelectorAll('.addon-checkbox').forEach(checkbox => {
+                            checkbox.addEventListener('change', function() {
+                                let totalAddonPrice = 0;
+                                let selectedAddons = [];
+
+                                document.querySelectorAll('.addon-checkbox:checked').forEach(selected => {
+                                    totalAddonPrice += parseFloat(selected.dataset.price);
+                                    selectedAddons.push(selected.value);
+                                });
+
+                                document.getElementById('addon_price').value = totalAddonPrice;
+                                document.getElementById('total-addon-price').textContent = totalAddonPrice.toFixed(2);
+
+                                document.querySelectorAll('.addon-label').forEach(label => {
+                                    label.classList.remove('btn-primary');
+                                    label.classList.add('btn-outline-primary');
+                                });
+
+                                selectedAddons.forEach(addon => {
+                                    let label = document.querySelector(`label[for="addon-${addon}"]`);
+                                    if (label) {
+                                        label.classList.remove('btn-outline-primary');
+                                        label.classList.add('btn-primary');
+                                    }
+                                });
+                            });
+                        });
+
                     });
                 </script>
             <?php endif; ?>

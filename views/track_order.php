@@ -18,21 +18,26 @@ if (!$order) {
 $status = $order['status'];
 $delivery_method = $order['delivery_method'];
 
-$status_steps = ['Pending', 'Processing', 'Ready for Pickup', 'On the Way', 'Completed'];
+if ($status == 'Cancelled') {
+    $status_steps = ['Cancelled'];
+} else {
+    $status_steps = ['Pending', 'Processing', 'Ready for Pickup', 'On the Way', 'Completed'];
 
-if ($delivery_method == 'pickup') {
-    $status_steps = array_diff($status_steps, ['On the Way']);
-} elseif ($delivery_method == 'delivery') {
-    $status_steps = array_diff($status_steps, ['Ready for Pickup']);
-}
+    if ($delivery_method == 'pickup') {
+        $status_steps = array_diff($status_steps, ['On the Way']);
+    } elseif ($delivery_method == 'delivery') {
+        $status_steps = array_diff($status_steps, ['Ready for Pickup']);
+    }
 
-if ($status == 'Ready for Pickup') {
-    $status_steps = array_diff($status_steps, ['On the Way']);
-} elseif ($status == 'On the Way' || $status == 'Completed') {
-    $status_steps = array_diff($status_steps, ['Ready for Pickup']);
+    if ($status == 'Ready for Pickup') {
+        $status_steps = array_diff($status_steps, ['On the Way']);
+    } elseif ($status == 'On the Way' || $status == 'Completed') {
+        $status_steps = array_diff($status_steps, ['Ready for Pickup']);
+    }
 }
 
 $status_index = array_search($status, $status_steps);
+
 ?>
 
 <!DOCTYPE html>
@@ -53,24 +58,29 @@ include BASE_PATH . 'components/user/head.php';
                         <h3 class="card-title text-center mb-4">Track Your Order</h3>
 
                         <p><strong>Order ID:</strong> <?php echo $order_id; ?></p>
-                        <p><strong>Current Status:</strong> <span class="badge badge-info"><?php echo $status; ?></span>
+                        <?php
+                        $badgeClass = ($status == 'Cancelled') ? 'bg-danger' : 'bg-info';
+                        ?>
+                        <p><strong>Current Status:</strong> <span class="badge <?php echo $badgeClass; ?>"><?php echo $status; ?></span></p>
                         </p>
 
-                        <div class="progress mb-4">
-                            <?php foreach ($status_steps as $index => $step): ?>
-                                <?php
-                                if ($index <= $status_index) {
-                                    $barClass = 'bg-success';
-                                } elseif ($index > $status_index) {
-                                    $barClass = 'bg-light';
-                                }
-                                ?>
-                                <div class="progress-bar <?php echo $barClass; ?>"
-                                    style="width: <?php echo 100 / count($status_steps); ?>%;" role="progressbar">
-                                    <?php echo $step; ?>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
+                    <div class="progress mb-4">
+                        <?php foreach ($status_steps as $index => $step): ?>
+                            <?php
+                            if ($status == 'Cancelled') {
+                                $barClass = 'bg-danger';
+                            } elseif ($index <= $status_index) {
+                                $barClass = 'bg-success';
+                            } else {
+                                $barClass = 'bg-light';
+                            }
+                            ?>
+                            <div class="progress-bar <?php echo $barClass; ?>" style="width: <?php echo 100 / count($status_steps); ?>%;"
+                                role="progressbar">
+                                <?php echo $step; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
 
                         <?php if ($status == 'Ready for Pickup' || $status == 'On the Way' || $status == 'Completed'): ?>
                             <h4 class="mt-4">Pickup Location Details</h4>

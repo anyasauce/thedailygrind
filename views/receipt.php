@@ -1,5 +1,4 @@
 <?php
-
 include $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/config/config.php';
 include BASE_PATH . 'components/user/user_session.php';
 
@@ -17,41 +16,53 @@ if (!$order) {
     die("Order not found.");
 }
 
-$query = "SELECT oi.*, p.product_name
-    FROM order_items oi
-    JOIN products p ON oi.product_id = p.product_id
-    WHERE oi.order_id = $order_id";
+$query = "SELECT oi.*, p.product_name, oi.addon_price 
+          FROM order_items oi
+          JOIN products p ON oi.product_id = p.product_id
+          WHERE oi.order_id = $order_id";
 
 $result = mysqli_query($conn, $query);
 
 $orderItems = [];
+$subtotal = 0; // Initialize subtotal
+$addonTotal = 0; // Initialize addon total
+
 while ($row = mysqli_fetch_assoc($result)) {
     $orderItems[] = $row;
+    // Calculate subtotal (product price * quantity)
+    $subtotal += $row['price'] * $row['quantity'];
+    // Calculate addon total (addon price * quantity)
+    if (!empty($row['addon_price'])) {
+        $addonTotal += $row['addon_price'] * $row['quantity'];
+    }
 }
+
+// Calculate tax (12% of subtotal + addonTotal)
+$tax = ($subtotal + $addonTotal) * 0.12;
+
+// Calculate total amount
+$delivery_fee = $order['delivery_fee'];
+$totalAmount = $subtotal + $addonTotal + $tax + $delivery_fee;
 
 $fullName = $order['fullname'];
 $orderId = $order['order_id'];
 $orderDate = date('F j, Y, g:i a', strtotime($order['created_at']));
 $paymentMethod = $order['payment_method'];
-$subtotal = $order['total'] - $order['tax'] - $order['delivery_fee'];
-$tax = $order['tax'];
-$delivery_fee = $order['delivery_fee'];
-$totalAmount = $order['total'];
 
 ?>
 
-
-
 <!DOCTYPE html>
-<html lang="en">    
+<html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Daily Grind | Receipt</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+        <style>
         body {
             background-color: #f8f9fa;
             font-family: 'Poppins', sans-serif;
@@ -106,10 +117,10 @@ $totalAmount = $order['total'];
         .divider {
             height: 12px;
             background: repeating-linear-gradient(-45deg,
-            #f8f9fa,
-            #f8f9fa 4px,
-            white 4px,
-            white 8px);
+                    #f8f9fa,
+                    #f8f9fa 4px,
+                    white 4px,
+                    white 8px);
             margin: 0;
             padding: 0;
         }
@@ -175,6 +186,18 @@ $totalAmount = $order['total'];
             text-align: right;
         }
 
+        .receipt-breakdown {
+            margin-bottom: 20px;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #555;
+        }
+
         .receipt-total {
             background-color: #f8f9fa;
             padding: 20px;
@@ -234,6 +257,13 @@ $totalAmount = $order['total'];
             font-weight: 500;
         }
 
+        .addon-info {
+            font-style: italic;
+            font-size: 12px;
+            color: #6c757d;
+            margin-top: 3px;
+        }
+
         @media print {
             body {
                 background-color: white;
@@ -278,9 +308,25 @@ $totalAmount = $order['total'];
                             <div class="item-name"><?= $item['product_name'] ?></div>
                             <div class="item-details">
                                 <?= $item['quantity'] ?> × ₱<?= number_format($item['price'], 2) ?>
+                                <?php if (!empty($item['size'])): ?>
+                                    <span> - <?= htmlspecialchars($item['size']) ?></span>
+                                <?php endif; ?>
                             </div>
+                            <?php if (!empty($item['addon'])): ?>
+                                <div class="addon-info">
+                                    + <?= htmlspecialchars($item['addon']) ?>
+                                    (₱<?= number_format($item['addon_price'], 2) ?>)
+                                </div>
+                            <?php endif; ?>
                         </div>
-                        <div class="item-price">₱<?= number_format($item['price'] * $item['quantity'], 2) ?></div>
+                        <div class="item-price">
+                            ₱<?= number_format($item['price'] * $item['quantity'], 2) ?>
+                            <?php if (!empty($item['addon'])): ?>
+                                <div class="addon-info text-end">
+                                    +₱<?= number_format($item['addon_price'] * $item['quantity'], 2) ?>
+                                </div>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
@@ -290,6 +336,12 @@ $totalAmount = $order['total'];
                     <span>Subtotal</span>
                     <span>₱<?= number_format($subtotal, 2) ?></span>
                 </div>
+                <?php if ($addonTotal > 0): ?>
+                    <div class="breakdown-row">
+                        <span>Addons</span>
+                        <span>₱<?= number_format($addonTotal, 2) ?></span>
+                    </div>
+                <?php endif; ?>
                 <div class="breakdown-row">
                     <span>Tax (12%)</span>
                     <span>₱<?= number_format($tax, 2) ?></span>

@@ -2,7 +2,7 @@
 include $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/config/config.php';
 include BASE_PATH . 'components/admin/admin_session.php';
 
-
+// Fetch users
 $getUsers = mysqli_query($conn, "SELECT * FROM users ORDER BY user_id DESC");
 ?>
 
@@ -42,74 +42,89 @@ include '../components/admin/head.php'; ?>
                                     <td><?php echo htmlspecialchars($user['fullname']); ?></td>
                                     <td><?php echo htmlspecialchars($user['email']); ?></td>
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#updateModal<?php echo $user['user_id']; ?>">
+                                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#updateModal<?php echo $user['user_id']; ?>">
                                             Update
                                         </button>
-                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $user['user_id']; ?>">
+                                        <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal<?php echo $user['user_id']; ?>">
                                             Delete
                                         </button>
                                     </td>
                                 </tr>
 
-                                <div class="modal fade" id="updateModal<?php echo $user['user_id']; ?>" tabindex="-1" aria-labelledby="updateModalLabel"
-                                    aria-hidden="true">
+                                <!-- Update User Modal -->
+                                <div class="modal fade" id="updateModal<?php echo $user['user_id']; ?>" tabindex="-1"
+                                    aria-labelledby="updateModalLabel<?php echo $user['user_id']; ?>" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="updateModalLabel">Update User</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <h5 class="modal-title"
+                                                    id="updateModalLabel<?php echo $user['user_id']; ?>">Update User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                             </div>
-                                
-                                            <form action="update_user.php" method="POST">
+                                            <form action="<?= route('admin', 'update_userprofile'); ?>" method="POST">
                                                 <div class="modal-body">
-                                                    <!-- Hidden User ID -->
-                                                    <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
-                                
-                                                    <!-- Full Name Input -->
+                                                    <input type="hidden" name="user_id"
+                                                        value="<?php echo $user['user_id']; ?>">
+
                                                     <div class="mb-3">
-                                                        <label for="fullname" class="form-label">Full Name</label>
-                                                        <input type="text" class="form-control" id="fullname" name="fullname"
-                                                            value="<?php echo htmlspecialchars($user['fullname']); ?>" required>
+                                                        <label for="fullname<?php echo $user['user_id']; ?>"
+                                                            class="form-label">Full Name</label>
+                                                        <input type="text" class="form-control"
+                                                            id="fullname<?php echo $user['user_id']; ?>" name="fullname"
+                                                            value="<?php echo htmlspecialchars($user['fullname']); ?>"
+                                                            required>
                                                     </div>
-                                
-                                                    <!-- Email Input -->
+
                                                     <div class="mb-3">
-                                                        <label for="email" class="form-label">Email</label>
-                                                        <input type="email" class="form-control" id="email" name="email"
-                                                            value="<?php echo htmlspecialchars($user['email']); ?>" required>
+                                                        <label for="email<?php echo $user['user_id']; ?>"
+                                                            class="form-label">Email</label>
+                                                        <input type="email" class="form-control"
+                                                            id="email<?php echo $user['user_id']; ?>" name="email"
+                                                            value="<?php echo htmlspecialchars($user['email']); ?>"
+                                                            required>
                                                     </div>
                                                 </div>
-                                
+
                                                 <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" name="update_profile" class="btn btn-primary">Save
+                                                        Changes</button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Cancel</button>
                                                 </div>
                                             </form>
-                                
                                         </div>
                                     </div>
                                 </div>
 
-                                <div class="modal fade" id="deleteModal<?php echo $user['user_id']; ?>" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                                <!-- Delete User Modal -->
+                                <div class="modal fade" id="deleteModal<?php echo $user['user_id']; ?>" tabindex="-1"
+                                    aria-labelledby="deleteModalLabel<?php echo $user['user_id']; ?>" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h5 class="modal-title" id="deleteModalLabel">Delete User</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                <h5 class="modal-title"
+                                                    id="deleteModalLabel<?php echo $user['user_id']; ?>">Delete User</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
                                             </div>
-                                
-                                            <form method="POST">
+                                            <form action="<?= route('admin', 'update_userprofile'); ?>" method="POST">
                                                 <div class="modal-body">
-                                                    Are you sure you want to delete <strong><?php echo htmlspecialchars($user['fullname']); ?></strong>?
-                                                    <input type="hidden" name="user_id" value="<?php echo $user['user_id']; ?>">
+                                                    Are you sure you want to delete
+                                                    <strong><?php echo htmlspecialchars($user['fullname']); ?></strong>?
+                                                    <input type="hidden" name="user_id"
+                                                        value="<?php echo $user['user_id']; ?>">
                                                 </div>
-                                
+
                                                 <div class="modal-footer">
-                                                    <button type="submit" name="delete_user" class="btn btn-danger">Delete</button>
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" name="deleteUserAccount"
+                                                        class="btn btn-danger">Delete</button>
+                                                    <button type="button" class="btn btn-secondary"
+                                                        data-bs-dismiss="modal">Cancel</button>
                                                 </div>
                                             </form>
-                                
                                         </div>
                                     </div>
                                 </div>
@@ -125,7 +140,7 @@ include '../components/admin/head.php'; ?>
     </div>
 
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#usersTable').DataTable();
         });
     </script>

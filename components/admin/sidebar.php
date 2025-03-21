@@ -51,11 +51,5 @@ $current_page = basename($_SERVER['PHP_SELF']);
                 <span class="nav-text">Orders</span>
             </a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link <?php echo ($current_page == 'sold.php') ? 'active' : ''; ?>" href="<?= route('admin', 'sold') ?>">
-                <i class="fas fa-check-circle"></i>
-                <span class="nav-text">Sold</span>
-            </a>
-        </li>
     </ul>
 </aside>

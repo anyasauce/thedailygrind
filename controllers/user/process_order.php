@@ -21,7 +21,7 @@ $deliveryMethod = $_POST['deliveryMethod'];
 $cart_items = json_decode($_POST['cart_items'], true);
 $subtotal = $_POST['subtotal'];
 $tax = $_POST['tax'];
-$delivery_fee = $_POST['delivery_fee'];
+$delivery_fee = isset($_POST['delivery_fee']) ? (float) $_POST['delivery_fee'] : 0;
 $total = $_POST['total'];
 
 if ($deliveryMethod == 'pickup') {
@@ -39,6 +39,7 @@ $orders = mysqli_query($conn, "INSERT INTO orders (
     '$address', '$city', '$region', '$zip', '$phone', '$notes', 'Pending', NOW()
 )");
 
+
 if ($orders) {
     $order_id = mysqli_insert_id($conn);
 
@@ -46,10 +47,14 @@ if ($orders) {
         $product_id = $item['product_id'];
         $quantity = $item['quantity'];
         $price = $item['price'];
+        $addon_price = isset($item['addon_price']) ? $item['addon_price'] : 0;
 
-        $query = mysqli_query($conn, "INSERT INTO order_items (order_id, product_id, quantity, price) VALUES ('$order_id', '$product_id', '$quantity', '$price')");
-        mysqli_query($conn, "DELETE FROM cart WHERE user_id = '$user_id'");
+        $query = mysqli_query($conn, "INSERT INTO order_items (order_id, product_id, quantity, price, addon_price) 
+            VALUES ('$order_id', '$product_id', '$quantity', '$price', '$addon_price')");
     }
+
+    mysqli_query($conn, "DELETE FROM cart WHERE user_id = '$user_id'");
+
     $_SESSION['user']['order_id'] = $order_id;
     ?>
     <script>
@@ -60,4 +65,5 @@ if ($orders) {
 } else {
     echo "Error: " . mysqli_error($conn);
 }
+
 ?>
