@@ -2,7 +2,6 @@
 include $_SERVER['DOCUMENT_ROOT'] . '/thedailygrind/config/config.php';
 include BASE_PATH . 'components/admin/admin_session.php';
 
-// Fetch users
 $getUsers = mysqli_query($conn, "SELECT * FROM users ORDER BY user_id DESC");
 ?>
 

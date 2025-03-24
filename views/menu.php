@@ -68,7 +68,7 @@ include BASE_PATH . 'components/user/head.php';
                                 $isOutOfStock = ($item['status'] === 'Out of Stock'); ?>
                                 <div class="col-6 col-md-4 col-lg-3 mb-4">
                                     <?php if ($item['product_name'] === $bestSeller): ?>
-                                        <sup class="text-danger fw-bold">Best Seller</sup>
+                                        <sup class="text-danger fw-bold d-none">Best Seller</sup>
                                     <?php endif; ?>
                                     <div <?= !$isOutOfStock ? 'data-bs-toggle="modal" data-bs-target="#productModal' . $item['product_id'] . '"' : '' ?>
                                         class="d-flex justify-content-center align-items-center cursor-pointer <?= $isOutOfStock ? 'disabled' : '' ?>"

@@ -69,7 +69,7 @@ include BASE_PATH . 'components/user/head.php';
                                     <form action="<?= route('controllers', 'cart_process'); ?>" method="POST"
                                         class="d-inline">
                                         <input type="hidden" name="order_id" value="<?= $row['order_id']; ?>">
-                                        <?php if ($row['status'] !== 'Cancelled'): ?>
+                                        <?php if ($row['status'] == 'Pending'): ?>
                                             <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                                 data-bs-target="#cancelOrderModal<?= $row['order_id']; ?>">
                                                 Cancel Order
